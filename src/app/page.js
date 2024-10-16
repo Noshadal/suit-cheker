@@ -1,101 +1,126 @@
+'use client';
 import Image from "next/image";
+import suit from "./suit (1).png";
+import suit1 from "./suit (2).png";
+import suit2 from "./suit (3).png";
+import suit3 from "./suit (4).png";
+import suit4 from "./suit (5).png";
+import suit5 from "./suit (6).png";
+import suit6 from "./suit (7).png";
+import suit7 from "./suit (8).png";
+import suit8 from "./suit (9).png";
+import up from "./14426.png";
+import { useState, useRef } from "react";
+
+const images = [
+  suit,
+  suit1,
+  suit2,
+  suit3,
+  suit4,
+  suit5,
+  suit6,
+  suit7,
+  suit8,
+];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [face, setFace] = useState(null); 
+  const [dragging, setDragging] = useState(false); 
+  const [position, setPosition] = useState({ x: 0, y: 0 }); 
+  const [scale, setScale] = useState(1); 
+  const imgRef = useRef(null); 
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const nextImage = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+
+  const previousImage = () => {
+    setCurrentIndex((prevIndex) =>
+      (prevIndex - 1 + images.length) % images.length
+    );
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFace(reader.result); 
+        setPosition({ x: 0, y: 0 }); 
+      };
+      reader.readAsDataURL(file); 
+    }
+  };
+
+  // Handle mouse down event
+  const handleMouseDown = (event) => {
+    setDragging(true);
+    imgRef.current.startX = event.clientX - position.x; 
+    imgRef.current.startY = event.clientY - position.y; 
+  };
+
+  const handleMouseMove = (event) => {
+    if (dragging) {
+      setPosition({
+        x: event.clientX - imgRef.current.startX,
+        y: event.clientY - imgRef.current.startY,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setDragging(false);
+  };
+
+  // Scale up and down functions
+  const scaleUp = () => {
+    setScale((prevScale) => prevScale + 0.1);
+  };
+
+  const scaleDown = () => {
+    setScale((prevScale) => Math.max(prevScale - 0.1, 0.1)); // Prevent scaling below 0.1
+  };
+
+  return (
+    <>
+      <div className="flex justify-center items-center flex-col h-[90vh] bg-gray-400">  
+        <input type="file" accept="image/* "id="submit" className="hidden" onChange={handleFileChange} />
+     
+      <div
+        className="flex justify-center items-center h-[90vh] gap-9 relative"
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp} // Stop dragging if mouse leaves the area
+      >
+        {face && (
+          <Image
+          ref={imgRef}
+          src={face}
+          height={350 * scale} 
+            width={250 * scale} 
+            alt="Profile"
+            className="mg"
+            style={{ position: 'absolute', left: position.x, top: position.y }}
+            onMouseDown={handleMouseDown}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          )}
+        <button onClick={previousImage} className= "text-[7vh] font-semibold">Back</button>
+        <Image
+          src={images[currentIndex]}
+          height={350}
+          width={250}
+          alt="Suit"
+        />
+        <button onClick={nextImage} className="text-[7vh] font-semibold">Next</button>
+      </div>
+          <label for="submit"><Image src= {up} width={50} height={80} className="bg-slate-50"/></label>
+          </div>
+      <div className="flex justify-center p-3 bg-gray-800">
+        <button onClick={scaleDown} className="text-white bg-red-600 px-4 py-2">Scale Down</button>
+        <button onClick={scaleUp} className="text-white bg-green-600 px-4 py-2 ml-2">Scale Up</button>
+      </div>
+    </>
   );
 }
